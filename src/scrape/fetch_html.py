@@ -1,6 +1,7 @@
-import config
+from config import Config
 from typing import Optional
 
+config = Config.configs
 driver = None  # save the driver instance here
 
 def fetch_html(url: str, option: str, arg: Optional[str] = None) -> str:
@@ -25,13 +26,13 @@ def fetch_html(url: str, option: str, arg: Optional[str] = None) -> str:
             html = requests.get(url, headers=headers).text
         case "selenium":
             from driver import Driver
-            if arg is not None and arg in config.BROWSER_LIST:
+            if isinstance(arg, str) and (arg in config["BROWSER_LIST"]):
                 driver_name = arg
             else:
-                driver_name = config.DEFAULT_BROWSER
+                driver_name = config["DEFAULT_BROWSER"]
 
             if driver is None:
-                driver = Driver(driver_name, config.BROWSER_PATH_DICT[driver_name])  # or "firefox", "edge"
+                driver = Driver(driver_name, config["BROWSER_PATH_DICT"][driver_name])  # or "firefox", "edge"
                 if driver is None:
                     raise RuntimeError("WebDriver failed to initialize.")
             html = driver.get_html(url)
@@ -45,14 +46,16 @@ def fetch_html(url: str, option: str, arg: Optional[str] = None) -> str:
 
 if __name__ == "__main__":
     url = "https://movie.douban.com/"
-    option = "requests"
+    option = "selenium"
     path = "src/test/data"
     html = fetch_html(url, option)
-    from parse_html import parse_html
-    parsed = parse_html(html, remove_script=True, remove_style=True)
-    print(parsed.prettify())
-    # import os
-    # if not os.path.exists(path):
-    #     os.makedirs(path)
-    # with open(os.path.join(path, "output2.html"), "w", encoding="utf-8") as f:
-    #     f.write(html)
+    # from parse_html import parse_html
+    # parsed = parse_html(html, remove_script=True, remove_style=True)
+    # print(parsed.prettify())
+    import os
+    if not os.path.exists(path):
+        os.makedirs(path)
+    with open(os.path.join(path, "output1.html"), "w", encoding="utf-8") as f:
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(html, "html.parser")
+        f.write(str(soup))
