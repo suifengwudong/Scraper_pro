@@ -3,29 +3,47 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.edge.service import Service as EdgeService
 from typing import Optional
-import config
+from config import Config
+
+config = Config.configs
 
 class Driver:
     _instance = None
     _driver = None
 
     def __new__(cls, browser_name: str, path: Optional[str] = None):
+        '''Create a singleton instance of the Driver class.
+        Args:
+            browser_name (str): The name of the browser to use.
+            path (Optional[str]): The path to the WebDriver executable.
+        Returns:
+            Driver: The singleton instance of the Driver class.
+        '''
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             if path is None:
-                if config.BROWSER_PATH_DICT.get(browser_name) is None:
+                if config["BROWSER_PATH_DICT"].get(browser_name) is None:
                     raise ValueError(f"No driver path specified for browser: {browser_name}")
                 else:
-                    path = config.BROWSER_PATH_DICT[browser_name]
+                    path = config["BROWSER_PATH_DICT"][browser_name]
             else:
-                if config.BROWSER_PATH_DICT.get(browser_name) is None:
-                    config.BROWSER_PATH_DICT[browser_name] = path
+                if config["BROWSER_PATH_DICT"].get(browser_name) is None:
+                    config["BROWSER_PATH_DICT"][browser_name] = path
 
             cls._driver = cls._create_driver(browser_name, path)
         return cls._instance
 
     @classmethod
     def _create_driver(cls, browser_name: str, driver_path: Optional[str] = None):
+        '''Create a WebDriver instance based on the specified browser.
+        Args:
+            browser_name (str): The name of the browser to use.
+            driver_path (Optional[str]): The path to the WebDriver executable.
+        Returns:
+            webdriver: The WebDriver instance.
+        Raises:
+            ValueError: If an unsupported browser is specified.
+        '''
         match browser_name.lower():
             case 'chrome':
                 options = webdriver.ChromeOptions()

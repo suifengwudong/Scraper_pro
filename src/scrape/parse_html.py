@@ -3,21 +3,34 @@ from bs4 import BeautifulSoup as BS
 from typing import Optional
 
 def parse_html(html: str, remove_script: bool = False, remove_style: bool = False, other_remove_tags: Optional[list[str]] = None) -> BS:
+    '''Parse HTML content into a BeautifulSoup object.
+    Args:
+        html (str): The HTML content to parse.
+        remove_script (bool): Whether to remove "script" tags. Default is False.
+        remove_style (bool): Whether to remove "style" tags. Default is False.
+        other_remove_tags (Optional[list[str]]): List of other tags to remove. Default is None.
+    Returns:
+        BS: The BeautifulSoup object representing the parsed HTML.
+    '''
     soup = BS(html, "html.parser")
-    # 这里可以添加更多的解析逻辑
+    tags: list[str] = []
     if remove_script:
-        for script in soup(["script"]):
-            script.decompose()
+        tags.append("script")
     if remove_style:
-        for style in soup(["style"]):
-            style.decompose()
+        tags.append("style")
     if other_remove_tags:
-        for tag in other_remove_tags:
-            for element in soup([tag]):
-                element.decompose()
+        tags.extend(other_remove_tags)
+    
+    for element in soup(tags):  # 直接传入列表
+        element.decompose()
+    
+    # 这里可以添加更多的解析逻辑
     return soup
 
 if __name__ == "__main__":
-    sample_html = "<html><head><title>Test Page</title></head><body><h1>Hello, World!</h1></body></html>"
-    parsed = parse_html(sample_html)
-    print(parsed.prettify())
+    with open("src/test/data/output1.html", "r", encoding="utf-8") as f:
+        sample_html = f.read()
+    parsed = parse_html(sample_html, remove_style=True, remove_script=True, other_remove_tags=["head"])
+    with open("temp.html", "w", encoding="utf-8") as f:
+        f.write(str(parsed))
+    # print(parsed.prettify())

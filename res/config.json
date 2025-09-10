@@ -3,7 +3,7 @@
     "BROWSER_PATH_DICT": {
         "chrome": "",
         "firefox": "",
-        "edge": "E:/PYTHON/Scripts/msedgedriver.exe"
+        "edge": "E:/Driver/Edge/edgedriver_win64/msedgedriver.exe"
     },
     "DEFAULT_BROWSER": "edge"
 }
