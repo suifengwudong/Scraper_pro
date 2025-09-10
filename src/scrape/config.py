@@ -1,7 +1,8 @@
+from json import load
 
-BROWSER_PATH_DICT = {
-    "chrome": None,  # Use default path
-    "edge": "E:/PYTHON/Scripts/msedgedriver.exe"
-}
+with open("res/config.json") as config_file:
+    config = load(config_file)
 
-driver_used = "edge"  # Options: "chrome", "firefox", "edge"
+BROWSER_LIST = config["BROWSER_LIST"]
+BROWSER_PATH_DICT = config["BROWSER_PATH_DICT"]
+DEFAULT_BROWSER = config["DEFAULT_BROWSER"]
