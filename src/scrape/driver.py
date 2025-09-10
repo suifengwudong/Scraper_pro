@@ -3,15 +3,25 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.edge.service import Service as EdgeService
 from typing import Optional
+import config
 
 class Driver:
     _instance = None
     _driver = None
 
-    def __new__(cls, browser_name: str, driver_path: Optional[str] = None):
+    def __new__(cls, browser_name: str, path: Optional[str] = None):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._driver = cls._create_driver(browser_name, driver_path)
+            if path is None:
+                if config.BROWSER_PATH_DICT.get(browser_name) is None:
+                    raise ValueError(f"No driver path specified for browser: {browser_name}")
+                else:
+                    path = config.BROWSER_PATH_DICT[browser_name]
+            else:
+                if config.BROWSER_PATH_DICT.get(browser_name) is None:
+                    config.BROWSER_PATH_DICT[browser_name] = path
+
+            cls._driver = cls._create_driver(browser_name, path)
         return cls._instance
 
     @classmethod
@@ -44,13 +54,6 @@ class Driver:
             case _:
                 raise ValueError(f"Unsupported browser: {browser_name}")
 
-    def acquire(self):
-        '''Get the WebDriver instance.
-        Returns:
-            webdriver: The WebDriver instance.
-        '''
-        return self._driver
-
     @classmethod
     def quit(cls):
         """Quit the WebDriver instance and reset singleton."""
@@ -58,3 +61,33 @@ class Driver:
             cls._driver.quit()
             cls._driver = None
             cls._instance = None
+    
+    @classmethod
+    def instance(cls):
+        '''Get the Class Driver instance.
+        Returns:
+            Driver: The Class Driver instance.
+        '''
+        return cls._instance
+    
+    def acquire(self):
+        '''Get the WebDriver instance.
+        Returns:
+            webdriver: The WebDriver instance.
+        '''
+        return self._driver
+    
+    def get_html(self, url: str) -> str:
+        '''Navigate to the specified URL and return the page source.
+        Args:
+            url (str): The URL to navigate to.
+        Returns:
+            str: The HTML content of the page.
+        Raises:
+            RuntimeError: If the WebDriver is not initialized.
+        '''
+        if self._driver is None:
+            raise RuntimeError("WebDriver is not initialized.")
+        self._driver.get(url)
+        self._driver.implicitly_wait(10) 
+        return self._driver.page_source

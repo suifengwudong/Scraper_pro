@@ -1,0 +1,9 @@
+{
+    "BROWSER_LIST": ["chrome", "firefox", "edge"],
+    "BROWSER_PATH_DICT": {
+        "chrome": "",
+        "firefox": "",
+        "edge": "E:/PYTHON/Scripts/msedgedriver.exe"
+    },
+    "DEFAULT_BROWSER": "edge"
+}
