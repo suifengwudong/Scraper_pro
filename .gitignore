@@ -1,6 +1,6 @@
 .vscode/
 __pycache__/
-test/
+data/
 
 *.md
 !README.md

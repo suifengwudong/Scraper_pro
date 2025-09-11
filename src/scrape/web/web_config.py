@@ -1,6 +1,6 @@
 from json import load, dump
 
-class Config():
+class WebConfig():
     '''Class to manage configuration settings for the scraper.'''
     config_path = "res/config.json"
     configs = {
@@ -21,7 +21,7 @@ class Config():
         with open(cls.config_path, "w") as f:
             dump(cls.configs, f, indent=4)
 
-Config.load()
+WebConfig.load()
 
 if __name__ == "__main__":
-    Config.save()
+    WebConfig.save()
