@@ -3,9 +3,9 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.edge.service import Service as EdgeService
 from typing import Optional
-from config import Config
+from .web_config import WebConfig
 
-config = Config.configs
+config = WebConfig.configs
 
 class Driver:
     _instance = None

@@ -1,7 +1,7 @@
-from config import Config
+from .web_config import WebConfig
 from typing import Optional
 
-config = Config.configs
+config = WebConfig.configs
 driver = None  # save the driver instance here
 
 def fetch_html(url: str, option: str, arg: Optional[str] = None) -> str:

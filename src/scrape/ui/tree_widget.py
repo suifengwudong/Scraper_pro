@@ -11,7 +11,6 @@ from bs4 import Tag
 class InvalidHtmlError(Exception):
     pass
 
-
 class DOMTreeWidget(QWidget):
     '''DOM Tree Widget with filtering and execution mode'''
     def __init__(self, soup: Tag):
