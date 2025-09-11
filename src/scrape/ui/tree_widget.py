@@ -188,7 +188,7 @@ if __name__ == "__main__":
 
     with open("src/test/data/output1.html", "r", encoding="utf-8") as f:
         html_content = f.read()
-    from parse_html import parse_html
+    from web.parse_html import parse_html
     soup = parse_html(html_content, remove_script=True, remove_style=True)
 
     tree_widget = DOMTreeWidget(soup)

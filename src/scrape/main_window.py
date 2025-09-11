@@ -1,10 +1,10 @@
 from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QApplication,
-    QVBoxLayout, 
+    QMainWindow, QApplication,
+    QWidget, QVBoxLayout, QStackedWidget,
     QLineEdit, QPushButton
 )
-from tree_widget import DOMTreeWidget
-from parse_html import parse_html
+from ui.tree_widget import DOMTreeWidget
+from web.parse_html import parse_html
 from bs4 import Tag
 
 class MainWindow(QMainWindow):
