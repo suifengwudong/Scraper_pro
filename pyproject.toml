@@ -10,7 +10,8 @@ requires-python = ">=3.8"
 dependencies = [
 	"selenium",
 	"requests",
-	"PyQt5"
+	"PyQt5",
+	"lxml"
 ]
 
 [build-system]

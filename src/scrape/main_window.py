@@ -1,7 +1,11 @@
 from PyQt5.QtWidgets import (
     QMainWindow, QApplication,
     QWidget, QGridLayout, QVBoxLayout, QHBoxLayout, QTabWidget,
-    QLineEdit, QPushButton, QTextEdit, QLabel, QComboBox, QFileDialog, QDialog, QMessageBox
+    QLineEdit, QPushButton, QLabel, QComboBox, QFileDialog, QDialog, QMessageBox
+)
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import (
+    QKeyEvent
 )
 from ui import *
 from web import *
@@ -14,8 +18,8 @@ class MainWindow(QMainWindow):
         self.resize(900, 600)
         self.is_driver_loaded = False
 
-        tab_widget = QTabWidget()
-        self.setCentralWidget(tab_widget)
+        self.tab_widget = QTabWidget()
+        self.setCentralWidget(self.tab_widget)
         label_style = "font-weight: bold; font-size: 32px;"
         
         # Tab1: 获取初始HTML
@@ -93,10 +97,10 @@ class MainWindow(QMainWindow):
                 color: #1565c0;
             }
         """
-        tab_widget.addTab(tab1, "HTML获取")
-        tab_widget.addTab(tab2, "DOMTree")
-        tab_widget.addTab(tab3, "自动化爬虫")
-        tab_widget.setStyleSheet(tab_style)
+        self.tab_widget.addTab(tab1, "HTML获取")
+        self.tab_widget.addTab(tab2, "DOMTree")
+        self.tab_widget.addTab(tab3, "自动化爬虫")
+        self.tab_widget.setStyleSheet(tab_style)
 
         self.show()
 
@@ -106,6 +110,17 @@ class MainWindow(QMainWindow):
             self.html_widget.html_view.print("DOMTree已更新")
         else:
             QMessageBox.warning(self, "警告", "请先加载HTML内容！")
+        
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.key() == Qt.Key.Key_Enter or event.key() == Qt.Key.Key_Return:
+            if self.tab_widget.currentIndex() == 0:
+                self.html_widget.load_html_btn.click()
+            else:
+                super().keyPressEvent(event)
+        elif event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+            super().keyPressEvent(event)
+        else:
+            super().keyPressEvent(event)
    
 
 if __name__ == "__main__":
