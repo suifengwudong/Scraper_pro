@@ -1,10 +1,10 @@
 from .web_config import WebConfig
+from .driver import Driver
 from typing import Optional
 
 config = WebConfig.configs
-driver = None  # save the driver instance here
 
-def fetch_html(url: str, option: str, arg: Optional[str] = None) -> str:
+def fetch_html(url: str, option: str, arg: Optional[str] = None, driver: Optional[Driver] = None) -> str:
     '''Get HTML content from a webpage using the specified method.
     Args:
         url (str): The URL of the webpage to fetch.
@@ -16,7 +16,6 @@ def fetch_html(url: str, option: str, arg: Optional[str] = None) -> str:
         ValueError: If an unsupported option is provided.
     '''
     html = ""
-    global driver
     match option.lower():
         case "requests":
             import requests
@@ -25,7 +24,6 @@ def fetch_html(url: str, option: str, arg: Optional[str] = None) -> str:
             }
             html = requests.get(url, headers=headers).text
         case "selenium":
-            from driver import Driver
             if isinstance(arg, str) and (arg in config["BROWSER_LIST"]):
                 driver_name = arg
             else:

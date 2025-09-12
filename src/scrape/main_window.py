@@ -16,55 +16,33 @@ class MainWindow(QMainWindow):
 
         tab_widget = QTabWidget()
         self.setCentralWidget(tab_widget)
+        label_style = "font-weight: bold; font-size: 32px;"
         
         # Tab1: 获取初始HTML
         tab1 = QWidget()
-        vbox1 = QVBoxLayout(tab1)
-        title_label = QLabel("HTML源获取")
-        title_label.setStyleSheet("font-weight: bold; font-size: 16px;")
-        vbox1.addWidget(title_label)
-
-        hbox_url = QHBoxLayout()
-        self.url_edit = QLineEdit()
-        self.url_edit.setPlaceholderText("输入网址")
-        hbox_url.addWidget(self.url_edit)
-        vbox1.addLayout(hbox_url)
-
-        hbox_opts = QHBoxLayout()
-        self.option_combo = QComboBox()
-        self.option_combo.addItems(["requests", "selenium"])
-        self.option_combo.setCurrentIndex(0)
-        self.option_combo.setToolTip("选择HTML获取方式")
-        self.load_driver_btn = QPushButton("加载驱动")
-        self.load_driver_btn.setEnabled(False)
-        self.load_html_btn = QPushButton("加载HTML")
-        hbox_opts.addWidget(self.option_combo)
-        hbox_opts.addWidget(self.load_driver_btn)
-        hbox_opts.addWidget(self.load_html_btn)
-        vbox1.addLayout(hbox_opts)
-
-        self.html_view = QTextEdit()
-        self.html_view.setReadOnly(True)
-        self.html_view.setPlaceholderText(">>>")
-        vbox1.addWidget(self.html_view)
-
-        self.option_combo.currentTextChanged.connect(self.on_option_changed)
-        self.load_driver_btn.clicked.connect(self.load_driver)
-        self.load_html_btn.clicked.connect(self.load_html)
+        grid1 = QGridLayout(tab1)
+        self.html_widget = HTMLWidget()
+        self.html_widget.load_html_btn.clicked.connect(self.load_soup)
+        label1 = QLabel("HTML内容获取与展示")
+        label1.setStyleSheet(label_style)
+        grid1.addWidget(label1)
+        grid1.addWidget(self.html_widget)
 
         # Tab2: DOMTree展示与选中
         tab2 = QWidget()
         grid2 = QGridLayout(tab2)
         self.tree_widget = DOMTreeWidget(soup)
-        grid2.addWidget(QLabel("DOM结构与元素选中"))
+        label2 = QLabel("DOM结构与元素选中")
+        label2.setStyleSheet(label_style)
+        grid2.addWidget(label2)
         grid2.addWidget(self.tree_widget)
 
         # Tab3: 自动化爬虫控制（优化布局）
         tab3 = QWidget()
         vbox3 = QVBoxLayout(tab3)
-        title_label3 = QLabel("自动化爬虫")
-        title_label3.setStyleSheet("font-weight: bold; font-size: 16px;")
-        vbox3.addWidget(title_label3)
+        label3 = QLabel("自动化爬虫")
+        label3.setStyleSheet(label_style)
+        vbox3.addWidget(label3)
 
         hbox_params = QHBoxLayout()
         self.crawl_param_edit = QLineEdit()
@@ -84,29 +62,51 @@ class MainWindow(QMainWindow):
         self.crawl_status.setStyleSheet("color: #124197; font-weight: bold;")
         vbox3.addWidget(self.crawl_status)
 
+        # 将Tab添加到TabWidget
+        tab_style = """
+            QTabWidget::pane {
+                border: 2px solid #bdbdbd;
+                background: #f5f5f5;
+                border-radius: 8px;
+            }
+            QTabBar::tab {
+                background: #e0e0e0;
+                color: #333;
+                padding: 10px 24px;
+                border: none;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+                margin-right: 2px;
+                font-size: 15px;
+            }
+            QTabBar::tab:selected {
+                background: #ffffff;
+                color: #1976d2;
+                font-weight: bold;
+                border-bottom: 2px solid #1976d2;
+            }
+            QTabBar::tab:!selected {
+                margin-top: 2px;
+            }
+            QTabBar::tab:hover {
+                background: #eeeeee;
+                color: #1565c0;
+            }
+        """
         tab_widget.addTab(tab1, "HTML获取")
         tab_widget.addTab(tab2, "DOMTree")
         tab_widget.addTab(tab3, "自动化爬虫")
+        tab_widget.setStyleSheet(tab_style)
 
         self.show()
 
-    def on_option_changed(self, text: str):
-        if text.lower() == "selenium":
-            self.load_driver_btn.setEnabled(True)
+    def load_soup(self):
+        if self.html_widget.soup:
+            self.tree_widget.load_soup(self.html_widget.soup)
+            self.html_widget.html_view.print("DOMTree已更新")
         else:
-            self.load_driver_btn.setEnabled(False)
-
-    def load_driver(self):
-        self.is_driver_loaded = True
-        if web_configs["DEFAULT_BROWSER"] == "":
-            dlg = DriverDialog(self)
-            dlg.exec_()
-            return
-        
-    def load_html(self):
-        if not self.is_driver_loaded:
-            QMessageBox.warning(self, "警告", "!!浏览器驱动未加载!!")
-            return
+            QMessageBox.warning(self, "警告", "请先加载HTML内容！")
+   
 
 if __name__ == "__main__":
     app = QApplication([])

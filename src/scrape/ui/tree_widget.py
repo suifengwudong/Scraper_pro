@@ -13,8 +13,8 @@ class InvalidHtmlError(Exception):
 
 class DOMTreeWidget(QWidget):
     '''DOM Tree Widget with filtering and execution mode'''
-    def __init__(self, soup: Tag):
-        super().__init__()
+    def __init__(self, soup: Tag, parent: QWidget | None = None, flags: Qt.WindowFlags | Qt.WindowType = Qt.WindowFlags()) -> None:
+        super().__init__(parent, flags)
 
         self.soup = soup
         self.tag_set = set()
@@ -164,6 +164,21 @@ class DOMTreeWidget(QWidget):
 
         for i in range(self.tree.topLevelItemCount()):
             walk(self.tree.topLevelItem(i))
+
+    def load_soup(self, soup: Tag):
+        self.soup = soup
+        self.tag_set.clear()
+        self.attr_set.clear()
+        self._collect_tags_attrs(soup)
+        self.tag_combo.clear()
+        self.tag_combo.addItem("全部")
+        self.tag_combo.addItems(sorted(self.tag_set))
+        self.tag_combo.setCurrentIndex(0)
+        self.attr_combo.clear()
+        self.attr_combo.addItem("全部")
+        self.attr_combo.addItems(sorted(self.attr_set))
+        self.attr_combo.setCurrentIndex(0)
+        self._populate_tree()
 
     def onCheckStateChanged(self, item, column):
         if column != 2:

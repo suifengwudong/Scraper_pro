@@ -1,6 +1,6 @@
 __all__ = [
     'parse_html',
-    'driver',
+    'Driver',
     'fetch_html',
     'web_configs',
     'WebConfig'

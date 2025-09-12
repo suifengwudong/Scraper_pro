@@ -1,11 +1,12 @@
+from web import web_configs, WebConfig
+from .output_view import OutputView
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QApplication,
-    QHBoxLayout, QGridLayout,
-    QFileDialog, QDialog, QLabel, QPushButton, QComboBox, QTextEdit,
+    QGridLayout,
+    QFileDialog, QDialog, QLabel, QPushButton,
     QWidget
 )
-from web import web_configs, WebConfig
 
 class DriverDialog(QDialog):
     def __init__(self, parent: QWidget | None = None, flags: Qt.WindowFlags = Qt.WindowFlags()) -> None:
@@ -15,8 +16,7 @@ class DriverDialog(QDialog):
         self.select_btn = QPushButton("选择", self)
         self.ok_btn = QPushButton("确定", self)
         self.cancel_btn = QPushButton("取消", self)
-        self.info = QTextEdit(self)
-        self.info.setReadOnly(True)
+        self.info = OutputView()
 
         layout = QGridLayout(self)
         layout.addWidget(self.label, 0, 0)
@@ -26,11 +26,13 @@ class DriverDialog(QDialog):
         layout.addWidget(self.cancel_btn, 2, 1)
         self.setLayout(layout)
 
+        self.ok_btn.clicked.connect(self.accept)
+        self.cancel_btn.clicked.connect(self.reject)
         self.select_btn.clicked.connect(self.select_driver)
 
     def select_driver(self):
         options = QFileDialog.Options()
-        options |= QFileDialog.ReadOnly
+        options |= QFileDialog.Option.ReadOnly
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             "选择浏览器驱动",
@@ -39,16 +41,17 @@ class DriverDialog(QDialog):
             options=options
         )
         if file_path:
-            self.info.setText('>>>' + file_path)
-        if 'edge' in file_path.lower():
-            web_configs["DEFAULT_BROWSER"] = "edge"
-            self.info.append('\n>>>' + "已选择Edge浏览器驱动")
-        elif 'chrome' in file_path.lower():
-            web_configs["DEFAULT_BROWSER"] = "chrome"
-            self.info.append('\n>>>' + "已选择Chrome浏览器驱动")
-        elif 'firefox' in file_path.lower():
-            web_configs["DEFAULT_BROWSER"] = "firefox"
-            self.info.append('\n>>>' + "已选择Firefox浏览器驱动")
+            self.info.print(file_path)
+
+        for browser in ("chrome", "edge", "firefox"):
+            if browser in file_path.lower():
+                self.selected_driver = browser
+                web_configs["DEFAULT_BROWSER"] = browser
+                self.info.print(f"已选择{browser}浏览器驱动")
+                break
+        else:
+            self.selected_driver = ""
+            self.info.print('警告: 未识别的浏览器驱动，请确保驱动与浏览器匹配！')
         WebConfig.save()
 
 
